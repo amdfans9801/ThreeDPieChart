@@ -1,6 +1,6 @@
 import {createRouter,createWebHashHistory} from 'vue-router'
 
-export default  createRouter({
+export default createRouter({
     history:createWebHashHistory(),
 	routes:[
         {
