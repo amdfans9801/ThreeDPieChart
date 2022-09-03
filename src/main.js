@@ -8,6 +8,7 @@ import 'element-plus/theme-chalk/index.css';
 
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import axios from 'axios';
 
 //全局的css样式
 import '@/assets/css/style.css';
@@ -22,10 +23,10 @@ app.mount('#app');
 
 
 //路由拦截器
-router.beforeEach((to, from, next) => {
-    //do something...
+// router.beforeEach((to, from, next) => {
+//     //do something...
 
-});
+// });
 
 //请求拦截器
 axios.interceptors.request.use(

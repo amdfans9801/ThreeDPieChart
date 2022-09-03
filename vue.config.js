@@ -1,7 +1,7 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require('@vue/cli-service');
 module.exports = defineConfig({
   transpileDependencies: true,
-  lintOnSave: false,
+  lintOnSave: false,    //关闭在保存的时候进行eslint验证
 
   devServer: {
 		port: 8080,

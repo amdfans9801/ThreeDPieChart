@@ -5,7 +5,7 @@ export default createRouter({
 	routes:[
         {
 			path: '/',
-			redirect: '/'
+			redirect: '/home'
 		},
         {
 			path: "/home",
@@ -14,7 +14,7 @@ export default createRouter({
 				// requireAuth: true,
 				title: '主页'
 			},
-			component:()=>import('../components/Home/home.vue')
+			component:()=>import('@/components/Home/home.vue')
 		},
     ]
 });
