@@ -14,7 +14,7 @@ export default createRouter({
 				// requireAuth: true,
 				title: '主页'
 			},
-			component:()=>import('@/components/Home/home.vue')
+			component:()=>import('@/components/Home/Home.vue')
 		},
     ]
 });

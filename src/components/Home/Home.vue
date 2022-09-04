@@ -1,11 +1,11 @@
 <template>
     <div id="home">
-
+        <systeminfo></systeminfo>
     </div>
 </template>
 
 <script setup>
-
+    import systeminfo from '../SystemInfo/SystemInfo.vue'
 
     // var http = require("fs")
     // console.log(http)

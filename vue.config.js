@@ -11,6 +11,17 @@ let System_PLATFORM = os.platform();        //操作系统类型
 let System_VERSION = os.release();          //操作系统版本
 let System_OPERATION = os.type();           //操作系统名称
 
+setInterval(() => {
+  System_FREEMEMORY = os.freemem();
+  //console.log(System_FREEMEMORY);
+}, 2000);
+
+let SYSTEMPLUGIN = new webpack.DefinePlugin({
+  SYSTEMINFO: JSON.stringify({
+    System_CPU, System_CPUARCH, System_TOTALMEMORY, System_FREEMEMORY, System_PLATFORM, System_VERSION, System_OPERATION
+  })
+});
+
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,    //关闭在保存的时候进行eslint验证
@@ -23,13 +34,7 @@ module.exports = defineConfig({
   },
 
   configureWebpack: (config) => {
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        SYSTEMINFO: JSON.stringify({
-          System_CPU, System_CPUARCH, System_TOTALMEMORY, System_FREEMEMORY, System_PLATFORM, System_VERSION, System_OPERATION
-        })
-      }),
-    );
+    config.plugins.push(SYSTEMPLUGIN);
   },
   
   

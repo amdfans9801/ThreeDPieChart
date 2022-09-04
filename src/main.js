@@ -21,7 +21,6 @@ app.use(elementplus);
 
 app.mount('#app');
 
-console.log(SYSTEMINFO);
 
 //路由拦截器
 // router.beforeEach((to, from, next) => {
