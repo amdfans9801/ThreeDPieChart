@@ -11,9 +11,17 @@
             <span class="itemtitle">内存:</span>
             <span class="itemvalue">{{totalram}}</span>
         </div>
+        <div id="jsramusage" class="systemitem">
+            <span class="itemtitle">JS(V8引擎)占用内存情况:</span>
+            <span class="itemvalue">{{JSARMUsage.value}}</span>
+        </div>
         <div id="gpu" class="systemitem">
             <span class="itemtitle">显卡:</span>
             <span class="itemvalue">{{gpuname}}</span>
+        </div>
+        <div id="operation" class="systemitem">
+            <span class="itemtitle">操作系统:</span>
+            <span class="itemvalue">{{operationsystem}}</span>
         </div>
     </div>
 </template>
@@ -25,6 +33,8 @@
     const System_CPU = ref(SYSTEMINFO.System_CPU);
     const System_CPUARCH = ref(SYSTEMINFO.System_CPUARCH);
     const System_TOTALMEMORY = ref(SYSTEMINFO.System_TOTALMEMORY);
+    const System_VERSION = ref(SYSTEMINFO.System_VERSION);
+    const System_OPERATION = ref(SYSTEMINFO.System_OPERATION)
     /**
      * 这里的空闲内存是vue打包的时候nodejs记录下当时的空闲内存，
      * 在终端中可以获取实时内存，但是打包之后这个值，就无法改变了，所以获取补不到整个系统的实时占用内存
@@ -39,11 +49,8 @@
     //     let usage = Math.round(((totalmemory_GB - freememory_GB) / totalmemory_GB) * 100);
     //     return usedmemorytext + '/' + totalmemorytext + 'GB' + '(' + usage + '%)';
     // });
-    let ramUsage = null;
     let refreshMemoryInterval = null
-    let MemoryUsage = computed(() => {
-        
-    });
+    let JSARMUsage = ref('');
 
     let cpuname = computed(() => {
         return System_CPU.value[0].model;
@@ -58,15 +65,20 @@
         let splitarr = temparr[1].split(' Direct');
         return splitarr[0];
     });
+    let operationsystem = computed(() => {
+        return System_OPERATION.value + ' ' + System_VERSION.value;
+    });
 
     onMounted(() => {
         getGPU();
         //getSystemInfo();
         //每两秒获取一次JS 对象（包括V8引擎内部对象）占用的内存
         refreshMemoryInterval = setInterval(() => {
-            ramUsage = ref(window.performance.memory)
+            JSARMUsage.value = getJSARMUsage();
+            console.log(JSARMUsage.value);
         }, 2000);
     });
+        
 
     function getGPU(){
         const canvas = document.createElement('canvas');
@@ -75,6 +87,42 @@
         let gpuinfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         return gpuinfo;
     }
+
+     /**
+     * window.performance.memory对象含有三个属性
+     * jsHeapSizeLimit：js堆内存大小限制
+     * totalJSHeapSize：当前js堆栈内存总大小
+     * usedJSHeapSize：JS 对象（包括V8引擎内部对象）占用的内存  
+     * usedJSHeapSize一定要小于totalJSHeapSize
+     */
+     function getJSARMUsage() {
+        let ramUsage = window.performance.memory;
+        let totalJSRAM = 0;
+        let totalJSRAMText = '';
+        let usedJSRAM = 0;
+        let usedJSRAMText = '';
+        let JSRAMUsageText = '';
+        if(ramUsage != null){
+            //1GB = 1024 * 1024 * 1024 = 1073741824
+            if(ramUsage.totalJSHeapSize >= 1073741824){
+                totalJSRAM =  (ramUsage.totalJSHeapSize / ( 1024 * 1024 * 1024)).toFixed(2);
+                totalJSRAMText = totalJSRAM + 'GB';
+            } else{
+                totalJSRAM = (ramUsage.totalJSHeapSize / ( 1024 * 1024)).toFixed(2);
+                totalJSRAMText = totalJSRAM + 'MB'
+            }
+            if(ramUsage.usedJSHeapSize >= 1073741824){
+                usedJSRAM = (ramUsage.usedJSHeapSize / ( 1024 * 1024 * 1024)).toFixed(2);
+                usedJSRAMText = usedJSRAM + 'GB';
+            } else{
+                usedJSRAM = (ramUsage.usedJSHeapSize / ( 1024 * 1024)).toFixed(2);
+                usedJSRAMText = usedJSRAM + 'MB';
+            }
+            let JSRAMUsageText = Math.round((usedJSRAM / totalJSRAM) * 100) + '%';
+            return usedJSRAMText + ' / ' + totalJSRAMText + ' (' + JSRAMUsageText + ')';
+        }
+        return '';
+    };
 
 
     
