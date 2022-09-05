@@ -75,7 +75,6 @@
         //每两秒获取一次JS 对象（包括V8引擎内部对象）占用的内存
         refreshMemoryInterval = setInterval(() => {
             JSARMUsage.value = getJSARMUsage();
-            console.log(JSARMUsage.value);
         }, 2000);
     });
         
