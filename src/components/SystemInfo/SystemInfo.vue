@@ -4,25 +4,26 @@
             <span class="titlespan">系统概览</span>
         </div>
         <div id="cpu" class="systemitem">
-            <span class="itemtitle">CPU:</span>
+            <span class="itemtitle">CPU：</span>
             <span class="itemvalue">{{cpuname}}</span>
         </div>
         <div id="memory" class="systemitem">
-            <span class="itemtitle">内存:</span>
+            <span class="itemtitle">内存：</span>
             <span class="itemvalue">{{totalram}}</span>
         </div>
-        <div id="jsramusage" class="systemitem">
-            <span class="itemtitle">JS(V8引擎)占用内存情况:</span>
-            <span class="itemvalue">{{JSARMUsage.value}}</span>
-        </div>
+        <!-- <div id="jsramusage" class="systemitem">
+            <span class="itemtitle">JS(V8引擎)占用内存情况：</span>
+            <span class="itemvalue">{{jsraminfo}}</span>
+        </div> -->
         <div id="gpu" class="systemitem">
-            <span class="itemtitle">显卡:</span>
+            <span class="itemtitle">显卡：</span>
             <span class="itemvalue">{{gpuname}}</span>
         </div>
         <div id="operation" class="systemitem">
-            <span class="itemtitle">操作系统:</span>
+            <span class="itemtitle">操作系统：</span>
             <span class="itemvalue">{{operationsystem}}</span>
         </div>
+
     </div>
 </template>
 
@@ -34,7 +35,8 @@
     const System_CPUARCH = ref(SYSTEMINFO.System_CPUARCH);
     const System_TOTALMEMORY = ref(SYSTEMINFO.System_TOTALMEMORY);
     const System_VERSION = ref(SYSTEMINFO.System_VERSION);
-    const System_OPERATION = ref(SYSTEMINFO.System_OPERATION)
+    const System_OPERATION = ref(SYSTEMINFO.System_OPERATION);
+    const System_NETWORK = ref(SYSTEMINFO.System_NETWORK);
     /**
      * 这里的空闲内存是vue打包的时候nodejs记录下当时的空闲内存，
      * 在终端中可以获取实时内存，但是打包之后这个值，就无法改变了，所以获取补不到整个系统的实时占用内存
@@ -50,7 +52,7 @@
     //     return usedmemorytext + '/' + totalmemorytext + 'GB' + '(' + usage + '%)';
     // });
     let refreshMemoryInterval = null
-    let JSARMUsage = ref('');
+    let JSARMUsage = null;
 
     let cpuname = computed(() => {
         return System_CPU.value[0].model;
@@ -69,13 +71,19 @@
         return System_OPERATION.value + ' ' + System_VERSION.value;
     });
 
+    let jsraminfo = computed(() => {
+        return JSARMUsage;
+    });
+
     onMounted(() => {
         getGPU();
         //getSystemInfo();
         //每两秒获取一次JS 对象（包括V8引擎内部对象）占用的内存
-        refreshMemoryInterval = setInterval(() => {
-            JSARMUsage.value = getJSARMUsage();
-        }, 2000);
+        // refreshMemoryInterval = setInterval(() => {
+        //     JSARMUsage = getJSARMUsage();
+        // }, 2000);
+
+        console.log(SYSTEMINFO)
     });
         
 
