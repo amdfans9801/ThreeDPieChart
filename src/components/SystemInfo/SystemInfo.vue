@@ -83,7 +83,6 @@
         //     JSARMUsage = getJSARMUsage();
         // }, 2000);
 
-        console.log(SYSTEMINFO)
     });
         
 
