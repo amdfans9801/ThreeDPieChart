@@ -10,6 +10,9 @@
  * (我真的不想搞，不想做任何事情....情绪也好不起来，但这可能是药物能够达到的最好状态了，已经足够稳定了。
  * 说实话，仔细比较之下能到达这种情况我应该对药物已经很满足了，不可能再奢求太多也不可能什么都靠药物，得要自己努力。
  * 但我真的真的没有力气做事情....淦，今天先到这吧，实在搞不下去23：27PM)
+ * date：2022.09.07 今天查看了three.js样例的代码，发现fps也是这种方法写的。或许three.js那里才是原创？
+ *       我看错了？？？
+ *       不过requestAnimationFrame方法应该对cpu比较友好，性能消耗更少一些
  */
 
 /**
@@ -28,5 +31,15 @@
 let frameInvokedCounts = 0;
 
 function calculateFPS(){
+
+}
+
+function animate(){
+    requestAnimationFrame(animate);
+    render();
+}
+
+function render(){
+    const timer = 0.0001 * Date.now();
 
 }
