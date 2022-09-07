@@ -11,7 +11,7 @@
  * 说实话，仔细比较之下能到达这种情况我应该对药物已经很满足了，不可能再奢求太多也不可能什么都靠药物，得要自己努力。
  * 但我真的真的没有力气做事情....淦，今天先到这吧，实在搞不下去23：27PM)
  * date：2022.09.07 今天查看了three.js样例的代码，发现fps也是这种方法写的。或许three.js那里才是原创？
- *       我看错了？？？
+ *       我看错了？？？ 找到了关于性能方面的源码，再看一下。
  *       不过requestAnimationFrame方法应该对cpu比较友好，性能消耗更少一些
  */
 
@@ -28,18 +28,53 @@
  *            所以页面实际上也是重绘的（只重绘显示区域）
  */
 
-let frameInvokedCounts = 0;
 
+//感觉这样差不多就行了....核心代码就这么一点点？
+let frames = 0;
+let beginTime = Date.now();
 function calculateFPS(){
+    requestAnimationFrame(() => {
+        frames++;
+        let currTime = Date.now();
 
+        if ( currTime >= beginTime + 1000 ) {
+            var fps = Math.round((frames * 1000) / (currTime - beginTime));
+            // console.log("fps=" + fps);
+            updateFPS(fps);
+            beginTime = currTime;
+            frames = 0;
+        }
+        calculateFPS();
+    });
 }
 
-function animate(){
-    requestAnimationFrame(animate);
-    render();
+function showFPS(){
+    let HomeContainer = document.getElementById('home');
+    let systemperformance = document.createElement('div');
+    let canvas = document.createElement('canvas');
+    systemperformance.appendChild(canvas);
+    HomeContainer.appendChild(systemperformance);
+    canvas.id = 'fpscanvas';
+    let WIDTH = 80;
+    let HEIGHT = 48;
+    canvas.style.cssText = 'width:80px;height:48px';
+    let context = canvas.getContext('2d');
+    context.font = 'bold 12px Helvetica,Arial,sans-serif';
+    context.fillRect(0, 0, WIDTH, HEIGHT);
+    context.fillStyle = '#ff0000';
+    // context.fillText();
+    
+    calculateFPS();
 }
 
-function render(){
-    const timer = 0.0001 * Date.now();
+function updateFPS(fps){
+    let Text_OffsetX = 200;
+    let Text_OffsetY = 160;
+    let canvas = document.getElementById('fpscanvas');
+    let context = canvas.getContext('2d');
+    context.fillText(fps, Text_OffsetX, Text_OffsetY);
+}
 
+export default{
+    calculateFPS, showFPS
 }
