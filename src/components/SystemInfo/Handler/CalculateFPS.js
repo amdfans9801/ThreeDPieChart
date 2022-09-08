@@ -13,6 +13,8 @@
  * date：2022.09.07 今天查看了three.js样例的代码，发现fps也是这种方法写的。或许three.js那里才是原创？
  *       我看错了？？？ 找到了关于性能方面的源码，再看一下。
  *       不过requestAnimationFrame方法应该对cpu比较友好，性能消耗更少一些
+ * 
+ * v1.1.0动态图标展示
  */
 
 /**
@@ -28,6 +30,7 @@
  *            所以页面实际上也是重绘的（只重绘显示区域）
  */
 
+ import * as echarts from 'echarts';
 
 //感觉这样差不多就行了....核心代码就这么一点点？
 let frames = 0;
@@ -41,6 +44,7 @@ function calculateFPS(){
             var fps = Math.round((frames * 1000) / (currTime - beginTime));
             // console.log("fps=" + fps);
             updateFPS(fps);
+            updateFPSTable(fps);
             beginTime = currTime;
             frames = 0;
         }
@@ -49,32 +53,73 @@ function calculateFPS(){
 }
 
 function showFPS(){
-    let HomeContainer = document.getElementById('home');
+    const HomeContainer = document.getElementById('home');
     let systemperformance = document.createElement('div');
-    let canvas = document.createElement('canvas');
-    systemperformance.appendChild(canvas);
     HomeContainer.appendChild(systemperformance);
-    canvas.id = 'fpscanvas';
-    let WIDTH = 80;
-    let HEIGHT = 48;
-    canvas.style.cssText = 'width:80px;height:48px';
-    let context = canvas.getContext('2d');
-    context.font = 'bold 12px Helvetica,Arial,sans-serif';
-    context.fillRect(0, 0, WIDTH, HEIGHT);
-    context.fillStyle = '#ff0000';
-    // context.fillText();
-    
+    let fpsSpan = document.createElement('span');
+    systemperformance.appendChild(fpsSpan);
+    fpsSpan.id = 'fpsspan';
+    fpsSpan.style.cssText = 'width:50px;height:20px;position:absolute;z-index:999;top:0;right:0;text-align:center;color:#000;';
+    fpsSpan.innerText = '0 fps';
+    createFPSTable();
     calculateFPS();
 }
 
 function updateFPS(fps){
-    let Text_OffsetX = 200;
-    let Text_OffsetY = 160;
-    let canvas = document.getElementById('fpscanvas');
-    let context = canvas.getContext('2d');
-    context.fillText(fps, Text_OffsetX, Text_OffsetY);
+    let fpsspan = document.getElementById('fpsspan');
+    fpsspan.innerHTML = fps + ' fps';
+}
+
+
+//再增加一个图表吧，正好echarts，动态数据图表2022.09.08
+
+let dynamicFPSTable = null;
+let fpsdata = [];
+let fpsoption = {};
+function createFPSTable(){
+    const HomeContainer = document.getElementById('home');
+    let fpsTableDiv = document.createElement('div');
+    HomeContainer.appendChild(fpsTableDiv);
+    fpsTableDiv.id = 'dynamicFPSTable';
+    fpsTableDiv.style.width = '500px';
+    fpsTableDiv.style.height = '500px';
+    fpsTableDiv.style.cssText = 'width:500px;height:500px;position:absolute;z-index:998;top:0;right:0;';
+    dynamicFPSTable = echarts.init(fpsTableDiv);
+    fpsoption = {
+        title: {text: 'FPS'},
+        tooltip: {
+
+        },
+        xAxis: {
+            name: 'time',
+            type: 'time',
+            boundaryGap: [(new Date()).getTime() - 30, (new Date()).getTime() + 30],
+        },
+        yAxis: {
+            name: 'fps',
+            min: 0,
+            max: 100,
+        },
+        series: [
+            {
+                type: 'line',
+                data: fpsdata
+            }
+        ],
+    };
+    
+}
+
+function updateFPSTable(fps){
+    if(fpsdata.length > 60){
+        //Array.shift() 删除数组开头元素
+        fpsdata.shift();
+    }
+    fpsdata.push(fps);
+    fpsoption.series[0].data = fpsdata;
+    dynamicFPSTable.setOption(fpsoption);
 }
 
 export default{
-    calculateFPS, showFPS
+    showFPS
 }

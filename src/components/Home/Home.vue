@@ -1,6 +1,6 @@
 <template>
     <div id="home">
-        <systeminfo></systeminfo>
+        <systeminfo ref="systeminfo"></systeminfo>
     </div>
 </template>
 
@@ -11,8 +11,7 @@
 
     
     onMounted(() => {
-        //systemperformace.showFPS();
-        systemperformace.calculateFPS();
+        systemperformace.showFPS();
     })
     
 </script>
