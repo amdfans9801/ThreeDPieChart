@@ -44,6 +44,7 @@ function calculateFPS(){
             var fps = Math.round((frames * 1000) / (currTime - beginTime));
             // console.log("fps=" + fps);
             updateFPS(fps);
+            console.log(new Date().toTimeString());
             updateFPSTable(fps);
             beginTime = currTime;
             frames = 0;
@@ -92,8 +93,8 @@ function createFPSTable(){
         },
         xAxis: {
             name: 'time',
-            type: 'time',
-            boundaryGap: [(new Date()).getTime() - 30, (new Date()).getTime() + 30],
+            //type: 'time',
+            // boundaryGap: [(new Date()).getTime() - 30, (new Date()).getTime() + 30],
         },
         yAxis: {
             name: 'fps',
@@ -115,7 +116,9 @@ function updateFPSTable(fps){
         //Array.shift() 删除数组开头元素
         fpsdata.shift();
     }
-    fpsdata.push(fps);
+    let nowtime = new Date().toTimeString().split(' ')[0];
+    let obj = {name: nowtime, value: fps};
+    fpsdata.push(obj);
     fpsoption.series[0].data = fpsdata;
     dynamicFPSTable.setOption(fpsoption);
 }
