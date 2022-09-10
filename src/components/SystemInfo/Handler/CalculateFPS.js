@@ -44,7 +44,6 @@ function calculateFPS(){
             var fps = Math.round((frames * 1000) / (currTime - beginTime));
             // console.log("fps=" + fps);
             updateFPS(fps);
-            console.log(new Date().toTimeString());
             updateFPSTable(fps);
             beginTime = currTime;
             frames = 0;
@@ -77,6 +76,7 @@ function updateFPS(fps){
 let dynamicFPSTable = null;
 let fpsdata = [];
 let fpsoption = {};
+let xAxisData = [];
 function createFPSTable(){
     const HomeContainer = document.getElementById('home');
     let fpsTableDiv = document.createElement('div');
@@ -86,6 +86,17 @@ function createFPSTable(){
     fpsTableDiv.style.height = '500px';
     fpsTableDiv.style.cssText = 'width:500px;height:500px;position:absolute;z-index:998;top:0;right:0;';
     dynamicFPSTable = echarts.init(fpsTableDiv);
+    //在初始化的时候就需要有10条数据，就都设置为0吧
+    //let zerofpsitem = {name: nowtime, value: 0};
+    let now = new Date().getTime();
+    for(let i = 0; i < 10; i++){
+        let timevalue = new Date(now - (10 - i) * 1000).toTimeString().split(' ')[0];
+        let dateitem = {name: timevalue, value: 0};
+        fpsdata.push(dateitem);
+        //就这样吧初始化时间格式
+        xAxisData.push(timevalue);
+    }
+
     fpsoption = {
         title: {text: 'FPS'},
         tooltip: {
@@ -95,31 +106,46 @@ function createFPSTable(){
             name: 'time',
             //type: 'time',
             // boundaryGap: [(new Date()).getTime() - 30, (new Date()).getTime() + 30],
+            data: xAxisData,
         },
         yAxis: {
             name: 'fps',
             min: 0,
             max: 100,
+            
         },
         series: [
             {
                 type: 'line',
+                showSymbol: false,
                 data: fpsdata
             }
         ],
+        //animationDuration: function(idx) {return idx * 100;}
+        animationDuration: 6000,
+        animationEasing: 'linear',
     };
     
 }
 
+//x轴的更新计数器，每10s更新一下x轴的数据
+let xAxisUpdateCounter = 0;
 function updateFPSTable(fps){
-    if(fpsdata.length > 60){
-        //Array.shift() 删除数组开头元素
-        fpsdata.shift();
-    }
+    //Array.shift() 删除数组开头元素
+    fpsdata.shift();
     let nowtime = new Date().toTimeString().split(' ')[0];
     let obj = {name: nowtime, value: fps};
     fpsdata.push(obj);
+    //x轴也这样更新
+    xAxisUpdateCounter++;
+    if(xAxisUpdateCounter >= 60){
+        xAxisData.shift();
+        xAxisData.push(nowtime);
+    }
+    
     fpsoption.series[0].data = fpsdata;
+    fpsoption.xAxis.data = xAxisData;
+    fpsoption.animationDuration = 6000;
     dynamicFPSTable.setOption(fpsoption);
 }
 
