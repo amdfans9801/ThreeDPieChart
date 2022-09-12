@@ -4,8 +4,9 @@
  * reference：https://blog.csdn.net/weixin_41326021/article/details/120195920
  * echarts-document: https://echarts.apache.org/zh/option-gl.html#series-surface
  * author: yanwenqing
- * time: 2022.08.19
- * version: v 1.0.0
+ * 2022.08.19 v 1.0.0
+ * 2022.09.12 开始手解参数方程，妈的，一定要搞懂
+ * 
  */
 
 /**
