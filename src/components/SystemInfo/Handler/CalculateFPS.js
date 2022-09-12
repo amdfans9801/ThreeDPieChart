@@ -44,7 +44,7 @@ function calculateFPS(){
             var fps = Math.round((frames * 1000) / (currTime - beginTime));
             // console.log("fps=" + fps);
             updateFPS(fps);
-            updateFPSTable(fps);
+            //updateFPSTable(fps);
             beginTime = currTime;
             frames = 0;
         }
@@ -61,7 +61,7 @@ function showFPS(){
     fpsSpan.id = 'fpsspan';
     fpsSpan.style.cssText = 'width:50px;height:20px;position:absolute;z-index:999;top:0;right:0;text-align:center;color:#000;';
     fpsSpan.innerText = '0 fps';
-    createFPSTable();
+    //createFPSTable();
     calculateFPS();
 }
 
@@ -72,7 +72,7 @@ function updateFPS(fps){
 
 
 //再增加一个图表吧，正好echarts，动态数据图表2022.09.08
-
+//2022.09.12 妈的，达不到我想要的效果....唉，淦
 let dynamicFPSTable = null;
 let fpsdata = [];
 let fpsoption = {};
