@@ -1,28 +1,32 @@
 <template>
     <div id="systeminfo">
         <div id="titlecontiner">
-            <span class="titlespan">系统概览</span>
+            <span class="titlespan">系统信息</span>
+            <el-switch class="showinfoswitch" v-model="isShowInfo" @change="changeLoadInfo" :inactive-text="switchLeftText"/>
         </div>
-        <div id="cpu" class="systemitem">
-            <span class="itemtitle">CPU：</span>
-            <span class="itemvalue">{{cpuname}}</span>
+        <div id="infocontainer" v-show="isShowInfo">
+            <div id="cpu" class="systemitem">
+                <span class="itemtitle">CPU：</span>
+                <span class="itemvalue">{{cpuname}}</span>
+            </div>
+            <div id="memory" class="systemitem">
+                <span class="itemtitle">内存：</span>
+                <span class="itemvalue">{{totalram}}</span>
+            </div>
+            <!-- <div id="jsramusage" class="systemitem">
+                <span class="itemtitle">JS(V8引擎)占用内存情况：</span>
+                <span class="itemvalue">{{jsraminfo}}</span>
+            </div> -->
+            <div id="gpu" class="systemitem">
+                <span class="itemtitle">显卡：</span>
+                <span class="itemvalue">{{gpuname}}</span>
+            </div>
+            <div id="operation" class="systemitem">
+                <span class="itemtitle">操作系统：</span>
+                <span class="itemvalue">{{operationsystem}}</span>
+            </div>
         </div>
-        <div id="memory" class="systemitem">
-            <span class="itemtitle">内存：</span>
-            <span class="itemvalue">{{totalram}}</span>
-        </div>
-        <!-- <div id="jsramusage" class="systemitem">
-            <span class="itemtitle">JS(V8引擎)占用内存情况：</span>
-            <span class="itemvalue">{{jsraminfo}}</span>
-        </div> -->
-        <div id="gpu" class="systemitem">
-            <span class="itemtitle">显卡：</span>
-            <span class="itemvalue">{{gpuname}}</span>
-        </div>
-        <div id="operation" class="systemitem">
-            <span class="itemtitle">操作系统：</span>
-            <span class="itemvalue">{{operationsystem}}</span>
-        </div>
+        
 
     </div>
 </template>
@@ -37,6 +41,9 @@
     const System_VERSION = ref(SYSTEMINFO.System_VERSION);
     const System_OPERATION = ref(SYSTEMINFO.System_OPERATION);
     const System_NETWORK = ref(SYSTEMINFO.System_NETWORK);
+
+    const isShowInfo = ref(true);
+    const switchLeftText = ref('显示');
     /**
      * 这里的空闲内存是vue打包的时候nodejs记录下当时的空闲内存，
      * 在终端中可以获取实时内存，但是打包之后这个值，就无法改变了，所以获取补不到整个系统的实时占用内存
@@ -130,7 +137,17 @@
         return '';
     };
 
-
+    //开关切换最大化和最小化系统信息
+    function changeLoadInfo(value){  
+        if(value){
+            document.getElementById('systeminfo').style.height = '145px';
+            switchLeftText.value = '显示';
+        } else {
+            document.getElementById('systeminfo').style.height = '35px';
+            switchLeftText.value = '隐藏';
+        }
+        
+    }
     
 </script>
 

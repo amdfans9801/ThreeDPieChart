@@ -1,5 +1,5 @@
 <template>
-    <div id="mainview">
+    <div id="chartcontainer">
         
     </div>
 </template>
@@ -9,5 +9,5 @@
 </script>
 
 <style scoped>
-
+    @import url(./css/ThreeDPieChart.css);
 </style>
