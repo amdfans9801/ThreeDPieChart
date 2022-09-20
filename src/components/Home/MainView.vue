@@ -14,13 +14,15 @@
     const piechartdom = document.getElementById('threedpiechartdom');
     const mychart = echarts.init(piechartdom); 
     
+    //初始化一个表的数据，之后考虑搭个后台
+    let piedata = reactive([]);
 
     onMounted(() => {
         threedpiechart.get3DPieOption();
     });
 
     function setChartData(){
-        chartOption
+        //chartOption
     }
 </script>
 
