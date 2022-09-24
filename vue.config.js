@@ -1,5 +1,7 @@
+
 const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack');
+const cesiumSource = "./node_modules/cesium/Source";
 
 //这里似乎可以获取到系统信息
 const os = require('os');
