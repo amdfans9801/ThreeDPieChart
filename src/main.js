@@ -9,8 +9,10 @@ import 'element-plus/theme-chalk/index.css';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import axios from 'axios';
-import * as Cesium from "cesium/Cesium";
-import * as widgets from "cesium/Widgets/widgets.css";
+
+import * as Cesium from 'cesium/Source/Cesium';
+import * as widgets from 'cesium/Source/Widgets/widgets.css';
+
 //全局的css样式
 import '@/assets/css/style.css';
 
