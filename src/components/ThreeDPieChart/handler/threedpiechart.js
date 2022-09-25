@@ -250,4 +250,6 @@ function getHeight(series, height) {
     return (height * 25) / series[0].pieData.value
 }
 
-export{ get3DPieOption, getParametricEquation}
+export default{ 
+    get3DPieOption, getParametricEquation
+}

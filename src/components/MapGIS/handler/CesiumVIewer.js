@@ -11,4 +11,11 @@ function initCesium(){
     let homecontainer = document.getElementById('home');
     cesiumContainer.id = 'cesiumContainer';
     homecontainer.appendChild(cesiumContainer);
+    const viewer = new Cesium.Viewer('cesiumContainer');
+}
+
+
+
+export default{
+    initCesium
 }
