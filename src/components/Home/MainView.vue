@@ -12,7 +12,7 @@
     import threedpiechart from '../ThreeDPieChart/handler/threedpiechart';
 
     const piechartdom = document.getElementById('threedpiechartdom');
-    const mychart = echarts.init(piechartdom); 
+    //const mychart = echarts.init(piechartdom); 
     
     //初始化一个表的数据，之后考虑搭个后台
     let piedata = reactive([]);
