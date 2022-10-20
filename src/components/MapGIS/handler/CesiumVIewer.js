@@ -6,11 +6,11 @@
 /**
  * 初始化地图
  */
-function initCesium(){
+function initCesium(container){
     const cesiumContainer = document.createElement('div');
-    let homecontainer = document.getElementById('home');
+    let mapcontainer = document.getElementById(container);
     cesiumContainer.id = 'cesiumContainer';
-    homecontainer.appendChild(cesiumContainer);
+    mapcontainer.appendChild(cesiumContainer);
     const viewer = new Cesium.Viewer('cesiumContainer');
 }
 

@@ -2,6 +2,8 @@
 const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path')
 
 //这里似乎可以获取到系统信息
 const os = require('os');
@@ -20,26 +22,39 @@ let System_NETWORK = os.networkInterfaces();//网络
 // }, 2000);
 
 let SYSTEMPLUGIN = new webpack.DefinePlugin({
-  SYSTEMINFO: JSON.stringify({
-    System_CPU, System_CPUARCH, System_TOTALMEMORY, System_FREEMEMORY, System_PLATFORM, System_VERSION, System_OPERATION, System_NETWORK
-  })
+    SYSTEMINFO: JSON.stringify({
+        System_CPU, System_CPUARCH, System_TOTALMEMORY, System_FREEMEMORY, System_PLATFORM, System_VERSION, System_OPERATION, System_NETWORK
+    }),
+    CESIUM_BASE_URL: JSON.stringify('./')
+});
+
+let cesiumSource = './node_modules/cesium/Source';
+let cesiumWorkers = '../Build/Cesium/Workers';
+
+let copywebpackplugin = new CopyWebpackPlugin({patterns: [
+    { from: path.join(cesiumSource, cesiumWorkers), to: 'Workers' },
+    { from: path.join(cesiumSource, 'Assets'), to: 'Assets' },
+    { from: path.join(cesiumSource, 'Widgets'), to: 'Widgets' },
+    { from: path.join(cesiumSource, 'ThirdParty/Workers'), to: 'ThirdParty/Workers' },
+  ],
 });
 
 module.exports = defineConfig({
-  transpileDependencies: true,
-  lintOnSave: false,    //关闭在保存的时候进行eslint验证
+    transpileDependencies: true,
+    lintOnSave: false,    //关闭在保存的时候进行eslint验证
 
-  devServer: {
-		port: 8080,
-		host: '0.0.0.0',
-		https: false,
-		open: false, // 配置自动启动浏览器
-  },
+    devServer: {
+        port: 8080,
+        host: '0.0.0.0',
+        https: false,
+        open: false, // 配置自动启动浏览器
+    },
 
-  configureWebpack: (config) => {
-    config.plugins.push(SYSTEMPLUGIN);
-    config.plugins.push(new NodePolyfillPlugin());
-  },
-  
-  
+    configureWebpack: (config) => {
+        config.plugins.push(SYSTEMPLUGIN);
+        config.plugins.push(new NodePolyfillPlugin());
+        config.plugins.push(copywebpackplugin);
+    },
+
+
 })

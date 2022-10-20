@@ -7,11 +7,14 @@ import elementplus from "element-plus"
 import 'element-plus/theme-chalk/index.css';
 
 import * as echarts from 'echarts';
+window.echarts = echarts;
 import 'echarts-gl';
 import axios from 'axios';
 
 import * as Cesium from 'cesium/Source/Cesium';
-import * as widgets from 'cesium/Source/Widgets/widgets.css';
+import 'cesium/Source/Widgets/widgets.css';
+window.Cesium = Cesium;
+
 
 //全局的css样式
 import '@/assets/css/style.css';

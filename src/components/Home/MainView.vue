@@ -18,7 +18,7 @@
     let piedata = reactive([]);
 
     onMounted(() => {
-        threedpiechart.get3DPieOption();
+        //threedpiechart.get3DPieOption();
     });
 
     function setChartData(){
