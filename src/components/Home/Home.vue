@@ -2,7 +2,7 @@
     <div id="home">
         <!-- <systeminfo ref="systeminfo"></systeminfo> -->
         <mapview ref="mapview"></mapview>
-        <mainview ref="mainview"></mainview>
+        <mainview ref="mainview" class="mainview"></mainview>
     </div>
 </template>
 
@@ -20,5 +20,5 @@
 </script>
 
 <style scoped>
-
+    @import url('./css/homestyle.css');
 </style>
