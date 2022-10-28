@@ -66,6 +66,57 @@ function initCesium(container){
 			viewer.layers.push(layer);
 		});
 	}
+
+    //鼠标事件
+    //注册鼠标滚轮按下MIDDLE_DOWN事件
+	viewer.screenSpaceEventHandler.setInputAction(function () {
+		wheelState = true; //激活指北针动态更新，只有在鼠标中键按下去时才会有效果
+	}, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
+	//注册鼠标滚轮松开MIDDLE_UP事件
+	viewer.screenSpaceEventHandler.setInputAction(function () {
+		wheelState = false; //取消指北针动态更新
+	}, Cesium.ScreenSpaceEventType.RIGHT_UP);
+	//注册鼠标左键双击事件
+	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_DoubleLeft_Click, movement);
+	}, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+	//注册鼠标左键单击事件
+	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+		// let position = that.viewer.scene.camera.pickEllipsoid(movement.position, that.viewer.scene.globe.ellipsoid);
+		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Left_Click, movement);
+	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	//注册鼠标右键单击事件
+	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Right_Click, movement);
+	}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+	//注册鼠标移动事件
+	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Move, movement);
+		if (wheelState) {
+			//这里同步指北针用的
+			let heading = Cesium.Math.toDegrees(viewer.camera.heading);
+			Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Middle_Move, heading);
+		}
+	}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+	//注册相机移动起始事件
+	// viewer.camera.moveStart.addEventListener(function () {
+	// 	//获取当前相机信息
+	// 	let cameraAtt = that.getCamera();
+	// 	// console.log(cameraAtt);
+	// 	Bus.VM.$emit(Bus.SignalType.Scene_Camera_MoveStart, cameraAtt);
+	// })
+	//鼠标左键按下
+	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+		Bus.VM.$emit(Bus.SignalType.Scene_Left_Down, movement);
+	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+	//鼠标左键抬起
+	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+		Bus.VM.$emit(Bus.SignalType.Scene_Left_Up, movement);
+	}, Cesium.ScreenSpaceEventType.LEFT_UP);
+	viewer.scene.camera.changed.addEventListener(function () {
+		Bus.VM.$emit("Scene_Camera_Changed");
+	});
+	Bus.VM.$emit(Bus.SignalType.Scene_Init_Finish, viewer);
 }
 
 
