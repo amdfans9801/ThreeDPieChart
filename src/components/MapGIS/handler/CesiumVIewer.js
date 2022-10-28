@@ -2,7 +2,9 @@
  * date 2022.09.24 这里打算用npm安装的纯cesium来做
  */
 
+import { viewerPerformanceWatchdogMixin } from "cesium";
 import { notificationEmits } from "element-plus";
+import { getGisBlue } from './LoadImageryProvider';
 
 
 /**
@@ -34,6 +36,17 @@ function initCesium(container){
         fullscreenElement: document.body,       //全屏时渲染的HTML元素 暂时没发现用处
         shadows: true,
         
+        orderIndependentTranslucency: false,    //去掉地球表面的大气效果的黑圈
+		contextOptions: {           //传递给Scene对象的上下文参数（scene.options）   
+			webgl: {
+				alpha: true,
+				reserveDrawingBuffer: true,
+				useDefaultRenderLoop: false,
+			},
+		},
+        imageryProvider: new Cesium.SingleTileImageryProvider({
+			url: require("../../../../public/img/cesium/globe.png"),
+		}),
         
     });
 
@@ -42,7 +55,19 @@ function initCesium(container){
 
     // viewer.creditContainer.destroy();
 
+    // 添加底图
+    viewer.layers = [];
+    let imageryList = [getGisBlue()];
+    if (Array.isArray(imageryList) && imageryList.length > 0) {
+		viewer.imageryLayers.removeAll();
+		imageryList.some((item) => {
+			let layer = viewer.imageryLayers.addImageryProvider(item);
+			viewer.imageryLayers.lowerToBottom(layer);
+			viewer.layers.push(layer);
+		});
+	}
 }
+
 
 
 
