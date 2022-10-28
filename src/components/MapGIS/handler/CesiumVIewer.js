@@ -78,16 +78,16 @@ function initCesium(container){
 	}, Cesium.ScreenSpaceEventType.RIGHT_UP);
 	//注册鼠标左键双击事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
-		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_DoubleLeft_Click, movement);
+		//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_DoubleLeft_Click, movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 	//注册鼠标左键单击事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
 		// let position = that.viewer.scene.camera.pickEllipsoid(movement.position, that.viewer.scene.globe.ellipsoid);
-		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Left_Click, movement);
+		//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Left_Click, movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	//注册鼠标右键单击事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
-		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Right_Click, movement);
+		//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Right_Click, movement);
 	}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 	//注册鼠标移动事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
@@ -95,7 +95,7 @@ function initCesium(container){
 		if (wheelState) {
 			//这里同步指北针用的
 			let heading = Cesium.Math.toDegrees(viewer.camera.heading);
-			Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Middle_Move, heading);
+			//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Middle_Move, heading);
 		}
 	}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 	//注册相机移动起始事件
