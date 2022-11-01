@@ -5,7 +5,7 @@
 import { viewerPerformanceWatchdogMixin } from "cesium";
 import { notificationEmits } from "element-plus";
 import { getGisBlue } from './LoadImageryProvider';
-
+import Bus from '@/bus/buses';
 
 /**
  * 初始化地图
