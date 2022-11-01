@@ -91,7 +91,7 @@ function initCesium(container){
 	}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 	//注册鼠标移动事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
-		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Move, movement);
+		//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Move, movement);
 		if (wheelState) {
 			//这里同步指北针用的
 			let heading = Cesium.Math.toDegrees(viewer.camera.heading);
@@ -107,16 +107,17 @@ function initCesium(container){
 	// })
 	//鼠标左键按下
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
-		Bus.VM.$emit(Bus.SignalType.Scene_Left_Down, movement);
+		//Bus.VM.$emit(Bus.SignalType.Scene_Left_Down, movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 	//鼠标左键抬起
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
-		Bus.VM.$emit(Bus.SignalType.Scene_Left_Up, movement);
+		//Bus.VM.$emit(Bus.SignalType.Scene_Left_Up, movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_UP);
 	viewer.scene.camera.changed.addEventListener(function () {
-		Bus.VM.$emit("Scene_Camera_Changed");
+		//Bus.VM.$emit("Scene_Camera_Changed");
 	});
-	Bus.VM.$emit(Bus.SignalType.Scene_Init_Finish, viewer);
+	//Bus.VM.$emit(Bus.SignalType.Scene_Init_Finish, viewer);
+	
 }
 
 
