@@ -120,11 +120,63 @@ function initCesium(container){
 	
 }
 
+function showSkybox(){
+	var blueSkyBox = new Cesium.SkyBox({
+		sources:{
+			positiveX: require('../../../../public/img/cesium/skybox/morning/v1/right.png'),
+			negativeX: require('../../../../public/img/cesium/skybox/morning/v1/left.png'),
+			positiveY: require('../../../../public/img/cesium/skybox/morning/v1/back.png'),
+			negativeY: require('../../../../public/img/cesium/skybox/morning/v1/front.png'),
+			positiveZ: require('../../../../public/img/cesium/skybox/morning/v1/top.png'),
+			negativeZ: require('../../../../public/img/cesium/skybox/morning/v1/bottom.png'),
+		}
+	});
+	viewer.scene.skyAtmosphere.show = false;
+	blueSkyBox.WSpeed = 1;
+	blueSkyBox.show = true;
+	viewer.scene.skyBox = blueSkyBox;
+	//相机上升到一定位置,天空盒出现渐变效果
+	viewer.scene.postRender.addEventListener(()=>{
+		setSkyBoxGradient();
+	});
+}
+
+// 设置天空盒的放大显现（渐变）效果（代码卸载方法里面，让mounted看起来简洁一点）
+function setSkyBoxGradient(){
+	var cameraHeight = scene.camera.positionCartographic.height;
+	var skyAtmosphereH1 = 22e4; // 大气开始渐变的最大高度
+	var skyBoxH1 = 15e4; // 天空开始渐变的最大高度
+	var skyBoxH2 = 12e4; // 天空开始渐变的最小高度
+	if (cameraHeight < skyAtmosphereH1 && Cesium.defined(viewer.scene.skyBox)){
+		var skyAtmosphereT = (cameraHeight - skyBoxH2) / (skyAtmosphereH1 - skyBoxH2);
+		if (skyAtmosphereT > 1.0) {
+			skyAtmosphereT = 1.0;
+		} else if (skyAtmosphereT < 0.0) {
+			skyAtmosphereT = 0.0;
+		}
+		var skyBoxT = (cameraHeight - skyBoxH2) / (skyBoxH1 - skyBoxH2);
+		if (skyBoxT > 1.0) {
+			skyBoxT = 1.0;
+		} else if (skyBoxT < 0.0) {
+			skyBoxT = 0.0;
+		}
+		viewer.scene.skyBox.alpha = 1.0 - skyBoxT;
+		if(cameraHeight > skyBoxH2){
+			scene.skyAtmosphere.show = true;
+			scene.skyAtmosphere.alpha = skyAtmosphereT;
+		}else{
+			scene.skyAtmosphere.show = false;
+		}
+	}else {
+		scene.skyAtmosphere.alpha = 1.0;
+	}
+}
+
 
 
 
 
 
 export default{
-    initCesium
+    initCesium, showSkybox
 }
