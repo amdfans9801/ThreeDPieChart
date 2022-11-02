@@ -117,7 +117,7 @@ function initCesium(container){
 		//Bus.VM.$emit("Scene_Camera_Changed");
 	});
 	//Bus.VM.$emit(Bus.SignalType.Scene_Init_Finish, viewer);
-	
+	viewer._cesiumWidget._creditContainer.style.display = "none"; //取消版权信息
 }
 
 function showSkybox(){
@@ -172,7 +172,44 @@ function setSkyBoxGradient(){
 	}
 }
 
+// 设置水面特效
+function setWaterEffects(){
+	let water = new Cesium.PrimitiveCollection();
+	
+	let polygonHierarchy = FeatureToPolygon(temp);
+	let geoHierarchy = new Cesium.GeometryInstance({
+		geometry: new Cesium.PolygonGeometry({
+			polygonHierarchy: polygonHierarchy,
+			extrudedHeight: 0,
+			height: 1,
+			vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT,
+		}),
+	});
+	let waterappearance = new Cesium.EllipsoidSurfaceAppearance({
+		material: new Cesium.Material({
+			fabric: {
+				type: "Water",
+				uniforms: {
+					baseWaterColor: new Cesium.Color(64/255.0, 157/255.0, 253/255.0, 0.5),
+					normalMap: require('../../../../public/img/cesium/waterNormals.jpg'),
+					frequency: 1000.0,
+					animationSpeed: 0.05,
+					amplitude: 10,
+					specularIntensity: 10,
+				},
+			},
+		}),
+		aboveGround: true,
+	});
 
+	let _water = new Cesium.GroundPrimitive({
+		geometryInstances: geoInstances,
+		appearance: waterappearance,
+		show: true,
+	});
+
+	water.add(_water);
+}
 
 
 
