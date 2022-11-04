@@ -6,6 +6,7 @@ import { viewerPerformanceWatchdogMixin } from "cesium";
 import { notificationEmits } from "element-plus";
 import { getGisBlue } from './LoadImageryProvider';
 import Bus from '@/bus/buses';
+import drawentities from './DarwEntities';
 
 /**
  * 初始化地图
@@ -67,6 +68,8 @@ function initCesium(container){
 		});
 	}
 
+	//事件
+	let wheelState = false;
     //鼠标事件
     //注册鼠标滚轮按下MIDDLE_DOWN事件
 	viewer.screenSpaceEventHandler.setInputAction(function () {
@@ -83,7 +86,7 @@ function initCesium(container){
 	//注册鼠标左键单击事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
 		// let position = that.viewer.scene.camera.pickEllipsoid(movement.position, that.viewer.scene.globe.ellipsoid);
-		//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Left_Click, movement);
+		Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Left_Click, movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	//注册鼠标右键单击事件
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
@@ -118,6 +121,31 @@ function initCesium(container){
 	});
 	//Bus.VM.$emit(Bus.SignalType.Scene_Init_Finish, viewer);
 	viewer._cesiumWidget._creditContainer.style.display = "none"; //取消版权信息
+
+	let handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+	handler.setInputAction(function (movement) {
+		let cartesian = viewer.scene.pickPosition(movement.position);
+		if (cartesian) {
+			let cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(cartesian);
+			let lon = Cesium.Math.toDegrees(cartographic.longitude);
+			let lat = Cesium.Math.toDegrees(cartographic.latitude);
+			let height = cartographic.height;
+			let extent = getExtent(viewer);
+			let padding = [0, 0, 0, 0];
+			let topOffset = degreeToMeter(extent[3] - lat);
+			let rightOffset = degreeToMeter(extent[2] - lon);
+			let bottomOffset = degreeToMeter(lat - extent[1]);
+			let leftOffset = degreeToMeter(lon - extent[0]);
+			padding = [topOffset, rightOffset, bottomOffset, leftOffset];
+			console.log("点击的经纬度坐标为:" + lon + "," + lat + " 海拔高度:" + height + "m");
+			// console.log(`当前相机位置为：x=${viewer.camera.position.x},y=${viewer.camera.position.y},z=${viewer.camera.position.z}, heading=${viewer.camera.heading},pitch=${viewer.camera.pitch}`);
+			// console.log("当前视域范围:" + extent);
+			// console.log("偏移:" + padding);
+		}
+	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+	window.viewer = viewer;
+	return viewer;
 }
 
 function showSkybox(){
@@ -211,9 +239,101 @@ function setWaterEffects(){
 	water.add(_water);
 }
 
+ //加一个gltf模型测试一下着色器材质
+function addGLTFModel(id, url, position){
+	drawentities.SetEntity({
+		id: id,
+		position: Cesium.Cartesian3.fromDegrees(position.position_x, position.position_y, position.position_z),
+		model: {
+			uri: '../../../../model/watertap.gltf',
+			scale: 10,
+		}
+	}, window.viewer);
+}
+
+// 添加水流的粒子特效
+function setWaterParticle(position){
+	let _position = Cesium.Cartesian3.fromDegrees(position.position_x, position.position_y, position.position_z)
+	let hole = window.viewer.entities.add({ position: _position});
+	let waterparticle = new Cesium.ParticleSystem({
+		image: '../../../../img/cesium/smoke.png',
+		startColor: new Cesium.Color(35/255, 168/255, 242/255, 0.7),
+		endColor: new Cesium.Color(35/255, 168/255, 242/255, 0.1),
+		startScale: 1,
+		endScale: 1,
+		minimumParticleLife: 3,		//粒子寿命的可能持续时间的最小界限（以秒为单位），超过该界限，将随机选择粒子的实际寿命
+		maximumParticleLife: 6,
+		minimumSpeed: 1,				//设置将随机选择粒子的实际速度的最小界限（米/秒）
+		maximumSpeed: 1,
+		imageSize: new Cesium.Cartesian2(6, 6),		//以像素为单位缩放粒子图像尺寸
+		emissionRate: 100,			//每秒要发射的粒子数
+		lifetime: 16.0,				//粒子系统发射粒子的时间（秒）
+		speed: 1.0,
+		emitter: new Cesium.CircleEmitter(0.5),		//此系统的粒子发射器的发射范围
+		//emitter: new Cesium.BoxEmitter(new Cesium.Cartesian3(0,1.2,6)),	
+		//emitter: new Cesium.ConeEmitter(90),
+		// modelMatrix: computeModelMatrix(hole),			//将粒子系统从模型变换为世界坐标的4x4变换矩阵
+		emitterModelMatrix: computeEmitterModelMatrix(),		//4x4变换矩阵，用于在粒子系统粒子发射器的朝向角度
+    	// emitterModelMatrix: computeEmitterModelMatrix(),
+		//updateCallback: callback,
+	});
+	viewer.scene.preUpdate.addEventListener(function (scene, time) {
+		waterparticle.modelMatrix = computeModelMatrix(hole, time);
+		//waterparticle.emitterModelMatrix = computeEmitterModelMatrix();
+	});
+	window.viewer.scene.primitives.add(waterparticle);
+}
+
+function computeModelMatrix(entity, time) {
+	return entity.computeModelMatrix(time, new Cesium.Matrix4());
+  }
+
+//用来设置该粒子系统的位置
+// function computeModelMatrix(entity, time){
+// 	var position = Cesium.Property.getValueOrUndefined(entity.position, time);
+// 	let modelMartrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+// 	return modelMartrix;
+// }
+
+//控制粒子系统中粒子发射器的朝向角度
+function computeEmitterModelMatrix(){
+	const trs = new Cesium.TranslationRotationScale();
+	const rotation = new Cesium.Quaternion();
+	const emitterModelMatrix = new Cesium.Matrix4();
+	const hpr = Cesium.HeadingPitchRoll.fromDegrees(0, 180, 0);
+	trs.translation = Cesium.Cartesian3.fromElements(1.5, -1.5, 1.2);
+	trs.rotation = Cesium.Quaternion.fromHeadingPitchRoll(hpr, rotation);
+	return Cesium.Matrix4.fromTranslationRotationScale(trs, emitterModelMatrix);
+}
+
+
+
+
+function getExtent(viewer) {
+	let rectangle = viewer.camera.computeViewRectangle();
+	let extent = [
+		Cesium.Math.toDegrees(rectangle.west),
+		Cesium.Math.toDegrees(rectangle.south),
+		Cesium.Math.toDegrees(rectangle.east),
+		Cesium.Math.toDegrees(rectangle.north),
+	];
+	return extent;
+}
+
+/**
+ * @Author: dongnan
+ * @Description: 经纬度转米(EPSG:4326)
+ * @Date: 2022-01-04 13:54:05
+ * @param {*} degree
+ */
+function degreeToMeter(degree) {
+	let meter = (degree / 360) * (2 * Math.PI * 6371004);
+	return meter;
+}
+
 
 
 
 export default{
-    initCesium, showSkybox
+    initCesium, showSkybox, addGLTFModel, setWaterParticle
 }
