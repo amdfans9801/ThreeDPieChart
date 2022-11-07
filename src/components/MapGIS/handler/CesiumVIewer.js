@@ -101,13 +101,6 @@ function initCesium(container){
 			//Bus.VM.$emit(Bus.SignalType.Scene_Mouse_Middle_Move, heading);
 		}
 	}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-	//注册相机移动起始事件
-	// viewer.camera.moveStart.addEventListener(function () {
-	// 	//获取当前相机信息
-	// 	let cameraAtt = that.getCamera();
-	// 	// console.log(cameraAtt);
-	// 	Bus.VM.$emit(Bus.SignalType.Scene_Camera_MoveStart, cameraAtt);
-	// })
 	//鼠标左键按下
 	viewer.screenSpaceEventHandler.setInputAction(function (movement) {
 		//Bus.VM.$emit(Bus.SignalType.Scene_Left_Down, movement);
@@ -239,6 +232,66 @@ function setWaterEffects(){
 	water.add(_water);
 }
 
+// threejs的水面效果
+function waterflows(degreesArray){
+	const _polygonHierarchy = new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(degreesArray));
+	let _primitivecollection = new Cesium.PrimitiveCollection();
+	const extrudedPolygon = new Cesium.PolygonGeometry({
+		polygonHierarchy: _polygonHierarchy,
+		extrudedHeight: 50,
+		height: 50,
+	});
+
+	const _geoInstance = new Cesium.GeometryInstance({
+		geometry: extrudedPolygon,
+		id: 'waterflows',
+	});
+	
+	const _material = new Cesium.Material({
+		fabric: {
+			type: 'Color',
+			uniforms: {
+				color: new Cesium.Color(64 / 255.0, 157 / 255.0, 253 / 255.0).withAlpha(0.618),
+			},
+		}
+	});
+
+	const _appearance = new Cesium.MaterialAppearance({
+		material: _material
+	});
+
+	let _entity = {
+		id: "geo_polygons",
+		polygon: {
+			hierarchy: _polygonHierarchy,
+			material: new Cesium.Color(0, 0, 0, 0),
+			outline: true,
+			height: 50,  // height is required for outline to display
+			outlineColor: new Cesium.Color(0.145, 0.906, 0.996),    //#25e7fe
+			outlineWidth: 3,
+		}
+	}
+	window.viewer.entities.add(_entity);
+	
+	_primitivecollection.add(new Cesium.Primitive({
+		geometoryInstance: _geoInstance,
+		appearance: _appearance,
+		show: true,
+	}));
+
+	window.viewer.scene.primitives.add(_primitivecollection);
+	// const vs = _appearance.vertexShaderSource;
+	// const fs = _appearance.fragmentShaderSource;
+	// const fs2 = _appearance.getFragmentShaderSource();
+	// console.log(`// 顶点着色器：
+	// ${vs}`);
+	// console.log(`// 片元着色器：
+	// ${fs}`);
+	// console.log(`// 片元着色器2：
+	// ${fs2}`);
+
+}
+
  //加一个gltf模型测试一下着色器材质
 function addGLTFModel(id, url, position){
 	drawentities.SetEntity({
@@ -286,7 +339,7 @@ function setWaterParticle(position){
 
 function computeModelMatrix(entity, time) {
 	return entity.computeModelMatrix(time, new Cesium.Matrix4());
-  }
+}
 
 //用来设置该粒子系统的位置
 // function computeModelMatrix(entity, time){
@@ -335,5 +388,5 @@ function degreeToMeter(degree) {
 
 
 export default{
-    initCesium, showSkybox, addGLTFModel, setWaterParticle
+    initCesium, showSkybox, addGLTFModel, setWaterParticle, waterflows
 }
