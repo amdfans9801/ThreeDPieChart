@@ -232,66 +232,6 @@ function setWaterEffects(){
 	water.add(_water);
 }
 
-// threejs的水面效果
-function waterflows(degreesArray){
-	const _polygonHierarchy = new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(degreesArray));
-	let _primitivecollection = new Cesium.PrimitiveCollection();
-	const extrudedPolygon = new Cesium.PolygonGeometry({
-		polygonHierarchy: _polygonHierarchy,
-		extrudedHeight: 50,
-		height: 50,
-	});
-
-	const _geoInstance = new Cesium.GeometryInstance({
-		geometry: extrudedPolygon,
-		id: 'waterflows',
-	});
-	
-	const _material = new Cesium.Material({
-		fabric: {
-			type: 'Color',
-			uniforms: {
-				color: new Cesium.Color(64 / 255.0, 157 / 255.0, 253 / 255.0).withAlpha(0.618),
-			},
-		}
-	});
-
-	const _appearance = new Cesium.MaterialAppearance({
-		material: _material
-	});
-
-	let _entity = {
-		id: "geo_polygons",
-		polygon: {
-			hierarchy: _polygonHierarchy,
-			material: new Cesium.Color(0, 0, 0, 0),
-			outline: true,
-			height: 50,  // height is required for outline to display
-			outlineColor: new Cesium.Color(0.145, 0.906, 0.996),    //#25e7fe
-			outlineWidth: 3,
-		}
-	}
-	window.viewer.entities.add(_entity);
-	
-	_primitivecollection.add(new Cesium.Primitive({
-		geometoryInstance: _geoInstance,
-		appearance: _appearance,
-		show: true,
-	}));
-
-	window.viewer.scene.primitives.add(_primitivecollection);
-	// const vs = _appearance.vertexShaderSource;
-	// const fs = _appearance.fragmentShaderSource;
-	// const fs2 = _appearance.getFragmentShaderSource();
-	// console.log(`// 顶点着色器：
-	// ${vs}`);
-	// console.log(`// 片元着色器：
-	// ${fs}`);
-	// console.log(`// 片元着色器2：
-	// ${fs2}`);
-
-}
-
  //加一个gltf模型测试一下着色器材质
 function addGLTFModel(id, url, position){
 	drawentities.SetEntity({
@@ -382,6 +322,72 @@ function getExtent(viewer) {
 function degreeToMeter(degree) {
 	let meter = (degree / 360) * (2 * Math.PI * 6371004);
 	return meter;
+}
+
+
+
+
+
+
+// threejs的水面效果
+function waterflows(degreesArray){
+	const _polygonHierarchy =  new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(degreesArray))
+	const extrudedPolygon = new Cesium.PolygonGeometry({
+		polygonHierarchy : _polygonHierarchy,
+		extrudedHeight: 50,
+		height: 50
+	});
+	  
+	const _instance = new Cesium.GeometryInstance({
+		geometry: extrudedPolygon,
+		id: 'box with height'
+	});
+	  
+	const _material = new Cesium.Material({
+		fabric: {
+			source: 
+			`czm_material czm_getMaterial(czm_materialInput materialInput)
+			{
+				czm_material material = czm_getDefaultMaterial(materialInput);
+				return material;
+			}`,
+		}
+	});
+	  
+	const _appearance =  new Cesium.MaterialAppearance({
+		material : _material,
+	});
+	  
+	var p = window.viewer.scene.primitives.add(new Cesium.Primitive({
+		geometryInstances: _instance,
+		appearance: _appearance,
+		releaseGeometryInstances: false,
+		compressVertices: false,
+	}));
+
+	let _entity = {
+		id: "geo_polygons",
+		polygon: {
+			hierarchy: _polygonHierarchy,
+			//material: new Cesium.Color(0, 0, 0, 0),
+			outline: true,
+			height: 10,  // height is required for outline to display
+			outlineColor: new Cesium.Color(0.145, 0.906, 0.996),    //#25e7fe
+			outlineWidth: 3,
+		}
+	}
+	//window.viewer.entities.add(_entity);
+	
+	// const vs = _appearance.vertexShaderSource;
+	// const fs = _appearance.fragmentShaderSource;
+	// const fs2 = _appearance.getFragmentShaderSource();
+	// console.log(`// 顶点着色器：
+	// ${vs}`);
+	// console.log(`// 片元着色器：
+	// ${fs}`);
+	// console.log(`// 片元着色器2：
+	// ${fs2}`);
+
 }
 
 
