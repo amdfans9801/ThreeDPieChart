@@ -22,7 +22,7 @@ function initCesium(container){
         homeButton: false,
         timeline: false,        //是否显示时间线控件
         showRenderLoopErrors: true,     //如果设置为true，发生渲染循环错误时，将自动给用户显示一个包含错误信息的HTML面板。
-        navigation: false,      //是否显示导航罗盘控件
+        navigation: true,      //是否显示导航罗盘控件
         navigationHelpButton: false,    //是否显示帮助信息控件
         navigationInstructionsInitiallyVisible: false,      //底部的文字介绍
         blurActiveElementOnCanvasFocus: false,
@@ -325,74 +325,6 @@ function degreeToMeter(degree) {
 }
 
 
-
-
-
-
-// threejs的水面效果
-function waterflows(degreesArray){
-	const _polygonHierarchy =  new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(degreesArray))
-	const extrudedPolygon = new Cesium.PolygonGeometry({
-		polygonHierarchy : _polygonHierarchy,
-		extrudedHeight: 50,
-		height: 50
-	});
-	  
-	const _instance = new Cesium.GeometryInstance({
-		geometry: extrudedPolygon,
-		id: 'box with height'
-	});
-	  
-	const _material = new Cesium.Material({
-		fabric: {
-			source: 
-			`czm_material czm_getMaterial(czm_materialInput materialInput)
-			{
-				czm_material material = czm_getDefaultMaterial(materialInput);
-				return material;
-			}`,
-		}
-	});
-	  
-	const _appearance =  new Cesium.MaterialAppearance({
-		material : _material,
-	});
-	  
-	var p = window.viewer.scene.primitives.add(new Cesium.Primitive({
-		geometryInstances: _instance,
-		appearance: _appearance,
-		releaseGeometryInstances: false,
-		compressVertices: false,
-	}));
-
-	let _entity = {
-		id: "geo_polygons",
-		polygon: {
-			hierarchy: _polygonHierarchy,
-			//material: new Cesium.Color(0, 0, 0, 0),
-			outline: true,
-			height: 10,  // height is required for outline to display
-			outlineColor: new Cesium.Color(0.145, 0.906, 0.996),    //#25e7fe
-			outlineWidth: 3,
-		}
-	}
-	//window.viewer.entities.add(_entity);
-	
-	// const vs = _appearance.vertexShaderSource;
-	// const fs = _appearance.fragmentShaderSource;
-	// const fs2 = _appearance.getFragmentShaderSource();
-	// console.log(`// 顶点着色器：
-	// ${vs}`);
-	// console.log(`// 片元着色器：
-	// ${fs}`);
-	// console.log(`// 片元着色器2：
-	// ${fs2}`);
-
-}
-
-
-
-
 export default{
-    initCesium, showSkybox, addGLTFModel, setWaterParticle, waterflows
+    initCesium, showSkybox, addGLTFModel, setWaterParticle
 }

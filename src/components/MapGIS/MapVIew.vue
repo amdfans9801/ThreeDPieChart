@@ -6,6 +6,7 @@
 import cesiumViewer from './handler/CesiumViewer';
 import { onMounted, ref } from 'vue';
 import Cesium3DTile from 'cesium/Source/Scene/Cesium3DTile';
+import watereffects from './handler/WaterEffects';
 
 // const viewer = ref(null);
 const position = ref({
@@ -41,7 +42,7 @@ onMounted(() => {
 		destination: new Cesium.Cartesian3.fromDegrees(118.7286257924172, 31.864404015122627, 5000),
 	});
 
-	cesiumViewer.waterflows(degreesArray.value);
+	watereffects.waterflows(degreesArray.value);
 });
 
 function setGltf() {
